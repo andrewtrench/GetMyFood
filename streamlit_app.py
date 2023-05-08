@@ -38,8 +38,9 @@ def get_recipe_and_wine(ingredients, dietary_requirement, cuisine):
     print (results)
     return results
 
-def search_spotify(song):
-    results = sp.search(q=song, limit=1)
+def search_spotify(artist_name, song_name):
+    query = f'artist:{artist_name} track:{song_name}'
+    results = sp.search(q=query, limit=1)
     song_url = results['tracks']['items'][0]['external_urls']['spotify']
     #print (song_url)
     return song_url
@@ -99,17 +100,15 @@ st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 """, unsafe_allow_html=True)
 
+background_image = "veggies.jpg"
 # Custom CSS
 custom_css = """
-<style>
-    stMarkdownContainer[data-testid="stMarkdownContainer"] {
-    background-color: #F0F0F0;
-    color: #000;
-    border: 2px solid #C0C0C0;
-    border-radius: 5px;
-    padding: 8px;
-    font-size: 16px;
-}
+<style>body {{
+        background-image: url({background_image_url});
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+    }}
     
     h1 {
         font-family: 'Roboto', sans-serif;
@@ -151,10 +150,10 @@ with center_column:
     ingredients = st.text_input("Enter ingredients (comma-separated):")
     cuisines = [
         'Italian', 'Chinese', 'Indian', 'Mexican', 'Japanese', 'Mediterranean',
-        'Middle Eastern', 'Thai', 'American', 'Greek', 'French', 'Spanish'
-    ]
+        'Middle Eastern', 'Thai', 'American', 'Greek', 'French', 'Spanish',"South African"
+    ].sort()
     cuisine = st.selectbox("Select a cuisine:", cuisines)
-    options = ['Vegetarian', 'Vegan', 'Anything goes', 'Low fat', 'Under 300 calories']
+    options = ['Vegetarian', 'Vegan', 'Anything goes', 'Keto','Low fat', 'Under 300 calories'].sort()
     dietary_requirement = st.selectbox("Select a dietary requirement:", options)
 
     if st.button("Find Recipe and Wine Pairing"):
@@ -162,7 +161,7 @@ with center_column:
         result = get_recipe_and_wine(ingredients_list, dietary_requirement, cuisine)
         formatted_result = format_subheadings(result)
         song,artist = extract_song_from_results(result)
-        song_url = search_spotify(song)
+        song_url = search_spotify(artist, song)
 
         st.markdown(formatted_result, unsafe_allow_html=True)
         whatsapp_url = generate_whatsapp_url(result)
