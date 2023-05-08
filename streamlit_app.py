@@ -6,9 +6,9 @@ import spotipy
 import streamlit as st
 from spotipy.oauth2 import SpotifyClientCredentials
 
-os.environ['OPENAI_API_KEY'] = st.secret['OPENAI_API_KEY']
-os.environ['SPOTIFY_CLIENT_ID'] = st.secret['SPOTIFY_CLIENT_ID']
-os.environ['SPOTIFY_CLIENT_SECRET'] = st.secret['SPOTIFY_CLIENT_SECRET']
+os.environ['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
+os.environ['SPOTIFY_CLIENT_ID'] = st.secrets['SPOTIFY_CLIENT_ID']
+os.environ['SPOTIFY_CLIENT_SECRET'] = st.secrets['SPOTIFY_CLIENT_SECRET']
 
 openai.api_key = os.environ['OPENAI_API_KEY']
 client_credentials_manager = SpotifyClientCredentials(client_id=os.environ['SPOTIFY_CLIENT_ID'], client_secret=os.environ['SPOTIFY_CLIENT_SECRET'])
