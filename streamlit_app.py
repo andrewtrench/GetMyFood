@@ -36,7 +36,7 @@ def get_recipe_and_wine(ingredients, dietary_requirement, cuisine):
         model="gpt-3.5-turbo",
         messages=[{"role": "system", "content": "You are a helpful chef and gourmand"},
                   {"role": "user", "content": f"{prompt}"}],
-        temperature=0.2,
+        temperature=0.5,
         max_tokens=500,
     )
     results = recipe_completion['choices'][0]['message']['content']
