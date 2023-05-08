@@ -10,6 +10,7 @@ os.environ['OPENAI_API_KEY'] = st.secret['OPENAI_API_KEY']
 os.environ['SPOTIFY_CLIENT_ID'] = st.secret['SPOTIFY_CLIENT_ID']
 os.environ['SPOTIFY_CLIENT_SECRET'] = st.secret['SPOTIFY_CLIENT_SECRET']
 
+openai.api_key = os.environ['OPENAI_API_KEY']
 client_credentials_manager = SpotifyClientCredentials(client_id=os.environ['SPOTIFY_CLIENT_ID'], client_secret=os.environ['SPOTIFY_CLIENT_SECRET'])
 
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
