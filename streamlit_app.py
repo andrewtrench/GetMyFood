@@ -1,12 +1,10 @@
-import streamlit as st
-import openai
-import requests
-import urllib.parse
-from streamlit_embedcode import github_gist
-import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
-import re
 import os
+import re
+import urllib.parse
+import openai
+import spotipy
+import streamlit as st
+from spotipy.oauth2 import SpotifyClientCredentials
 
 os.environ['OPENAI_API_KEY'] = st.secret['OPENAI_API_KEY']
 os.environ['SPOTIFY_CLIENT_ID'] = st.secret['SPOTIFY_CLIENT_ID']
