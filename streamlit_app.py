@@ -34,7 +34,7 @@ def get_recipe_and_wine(ingredients, dietary_requirement, cuisine):
         model="gpt-3.5-turbo",
         messages=[{"role": "system", "content": "You are a helpful chef and gourmand"},
                   {"role": "user", "content": f"{prompt}"}],
-        temperature=0.5,
+        temperature=0.7,
         max_tokens=500,
     )
     results = recipe_completion['choices'][0]['message']['content']
@@ -183,6 +183,7 @@ with center_column:
         result = get_recipe_and_wine(ingredients_list, dietary_requirement, cuisine)
         formatted_result = format_subheadings(result)
         song_result = get_song(cuisine)
+        formatted_result = formatted_result + "\n\n" + song_result
         song,artist = extract_song_from_results(song_result)
         song_url = search_spotify(artist, song)
 
