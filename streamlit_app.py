@@ -5,6 +5,10 @@ import openai
 import spotipy
 import streamlit as st
 from spotipy.oauth2 import SpotifyClientCredentials
+import base64
+from PIL import Image
+from io import BytesIO
+
 
 os.environ['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
 os.environ['SPOTIFY_CLIENT_ID'] = st.secrets['SPOTIFY_CLIENT_ID']
@@ -88,6 +92,13 @@ def format_subheadings(result_text):
 
     return "\n".join(lines)
 
+def image_to_base64(image_path):
+    with Image.open(image_path) as img:
+        buffer = BytesIO()
+        img.save(buffer, format="JPEG")
+        img_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+    return f"data:image/jpeg;base64,{img_base64}"
 
 st.set_page_config(page_title="VineDine: Savor the Flavor", layout="wide")
 
@@ -101,33 +112,27 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 background_image = "veggies.jpg"
+background_image_base64 = image_to_base64(background_image)
+
 # Custom CSS
-custom_css = """
+custom_css = f"""
 <style>body {{
-        background-image: url({background_image_url});
+        background-image: url({background_image_base64});
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
     }}
     
-    h1 {
+    h1 {{
         font-family: 'Roboto', sans-serif;
         color: #25D366;
-    }
+    }}
 
-    div[data-testid="stText"] input {
+    button {{
         font-family: 'Roboto', sans-serif;
-    }
+    }}
 
-    div[data-testid="stSelectbox"] select {
-        font-family: 'Roboto', sans-serif;
-    }
-
-    button {
-        font-family: 'Roboto', sans-serif;
-    }
-
-    .btn {
+    .btn {{
         background-color: #25D366;
         color: white;
         font-family: 'Roboto', sans-serif;
@@ -137,7 +142,7 @@ custom_css = """
         display: inline-block;
         cursor: pointer;
         border-radius: 25px
-    }
+    }}
 </style>"""
 
 st.markdown(custom_css, unsafe_allow_html=True)
@@ -151,7 +156,7 @@ with center_column:
     cuisines = [
         'Italian', 'Chinese', 'Indian', 'Mexican', 'Japanese', 'Mediterranean',
         'Middle Eastern', 'Thai', 'American', 'Greek', 'French', 'Spanish',"South African"
-    ].sort()
+    ]
     cuisine = st.selectbox("Select a cuisine:", cuisines)
     options = ['Vegetarian', 'Vegan', 'Anything goes', 'Keto','Low fat', 'Under 300 calories'].sort()
     dietary_requirement = st.selectbox("Select a dietary requirement:", options)
