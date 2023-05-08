@@ -1,0 +1,5 @@
+openai==0.27.6
+Requests==2.30.0
+streamlit==1.22.0
+
+spotipy~=2.23.0
