@@ -26,7 +26,8 @@ def get_recipe_and_wine(ingredients, dietary_requirement, cuisine):
              f"requirement. Also, suggest a wine pairing and suggest a South African wine by brand specifically if " \
              f"possible, " \
              f"and complimentary spices and herbs. Show the estimated calories per portion. Also recommend a " \
-             f"song to listen to while cooking this recipe. Use these subheadings it " \
+             f"song to listen to while cooking this recipe but select from a wide range of artists who match the " \
+             f"culture of the cuisine. Use these subheadings it " \
              f"the results: 'Ingredients:', 'Instructions:', 'Wine pairing:','South African wine recommendation:', " \
              f"'Complimentary spices and herbs:', 'Estimated calories per portion:','Song recommendation:'. Give the " \
              f"recipe a name and use it as a title indicated by 'Title:'.Use centigrade for temperature and grams for weight. "
