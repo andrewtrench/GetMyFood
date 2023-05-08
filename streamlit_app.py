@@ -44,7 +44,8 @@ def get_recipe_and_wine(ingredients, dietary_requirement, cuisine):
 def get_song(cuisine):
 
     prompt = f"Recommend a song and artisy to listen to while cooking {cuisine} food. Select from a wide range of artists who " \
-             f"match the culture. Use this subheading: 'Song recommendation:'"
+             f"match the culture. Choose an artist and song at random from any decade from the 1940s to the 2020s. " \
+             f"Use this subheading: 'Song recommendation:'"
     recipe_completion = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "system", "content": "You are a helpful DJ"},
@@ -183,7 +184,7 @@ with center_column:
         result = get_recipe_and_wine(ingredients_list, dietary_requirement, cuisine)
         formatted_result = format_subheadings(result)
         song_result = get_song(cuisine)
-        formatted_result = formatted_result + "\n\n" + song_result
+        formatted_result = formatted_result + "\n\n" + song_result.replace("Song recommendation:", "<br>Song recommendation:</br>")
         song,artist = extract_song_from_results(song_result)
         song_url = search_spotify(artist, song)
 
