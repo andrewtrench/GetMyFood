@@ -158,7 +158,7 @@ with center_column:
         'Middle Eastern', 'Thai', 'American', 'Greek', 'French', 'Spanish',"South African"
     ]
     cuisine = st.selectbox("Select a cuisine:", cuisines)
-    options = ['Vegetarian', 'Vegan', 'Anything goes', 'Keto','Low fat', 'Under 300 calories'].sort()
+    options = ['Anything goes', 'Keto','Low fat', 'Under 300 calories','Vegetarian', 'Vegan', 'Gluten-free']
     dietary_requirement = st.selectbox("Select a dietary requirement:", options)
 
     if st.button("Find Recipe and Wine Pairing"):
