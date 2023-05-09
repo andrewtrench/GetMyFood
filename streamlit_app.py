@@ -244,7 +244,7 @@ with center_column:
             record = create_db_dict(title,result,song,artist,song_url)
             insert_data(record)
             records = get_records()
-            st.write(records)
+            #st.write(records)
 
 
 
