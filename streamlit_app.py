@@ -76,7 +76,17 @@ def get_genre(cuisine):
         temperature=0.1,
         max_tokens=50,
     )
-    genre_recommendation = list(genre_completion['choices'][0]['message']['content'])
+    s = genre_completion['choices'][0]['message']['content']
+    match = re.search(r'\[\".*?\"\]', s)
+
+    if match:
+        # extract the list from the string
+        extracted_list_str = match.group(0)
+
+        # convert the extracted string to a list
+        extracted_list = eval(extracted_list_str)
+
+    genre_recommendation = extracted_list
     st.write(genre_recommendation)
     # select a genre at random
     #genre_recommendation = random.choice(genre_recommendation)
