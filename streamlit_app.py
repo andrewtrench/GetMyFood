@@ -136,7 +136,7 @@ def image_to_base64(image_path):
     return f"data:image/jpeg;base64,{img_base64}"
 
 
-st.set_page_config(page_title="VineDine: Savor the Flavor", layout="wide")
+st.set_page_config(page_title="VineDineVibe", layout="centered", page_icon="🍷")
 
 # Include Bootstrap CDN
 st.markdown("""
