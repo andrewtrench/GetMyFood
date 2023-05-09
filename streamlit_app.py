@@ -8,17 +8,17 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import base64
 from PIL import Image
 from io import BytesIO
-
+import random
 
 os.environ['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
 os.environ['SPOTIFY_CLIENT_ID'] = st.secrets['SPOTIFY_CLIENT_ID']
 os.environ['SPOTIFY_CLIENT_SECRET'] = st.secrets['SPOTIFY_CLIENT_SECRET']
 
 openai.api_key = os.environ['OPENAI_API_KEY']
-client_credentials_manager = SpotifyClientCredentials(client_id=os.environ['SPOTIFY_CLIENT_ID'], client_secret=os.environ['SPOTIFY_CLIENT_SECRET'])
+client_credentials_manager = SpotifyClientCredentials(client_id=os.environ['SPOTIFY_CLIENT_ID'],
+                                                      client_secret=os.environ['SPOTIFY_CLIENT_SECRET'])
 
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
-
 
 
 def get_recipe_and_wine(ingredients, dietary_requirement, cuisine):
@@ -38,36 +38,57 @@ def get_recipe_and_wine(ingredients, dietary_requirement, cuisine):
         max_tokens=500,
     )
     results = recipe_completion['choices'][0]['message']['content']
-    print (results)
+    print(results)
     return results
 
-def return_random_song():
-    st.write(sp.recommendation_genre_seeds())
 
-def get_song(cuisine):
+def return_random_song(genre):
+    # Choose a genre
 
-    prompt = f"Recommend a song and artisy to listen to while cooking {cuisine} food. Select from a wide range of artists who " \
-             f"match the culture. Choose an artist and song at random from any decade from the 1940s to the 2020s. " \
-             f"Use this subheading: 'Song recommendation:'"
+    # Get playlists of the genre
+    playlists = sp.category_playlists(category_id=genre, limit=50)
+    playlist_items = playlists['playlists']['items']
+
+    # Choose a random playlist
+    random_playlist = random.choice(playlist_items)
+    playlist_id = random_playlist['id']
+
+    # Get the tracks in the playlist
+    tracks = sp.playlist_items(playlist_id)
+    track_items = tracks['items']
+
+    # Choose a random track
+    random_track = random.choice(track_items)
+    track_name = random_track['track']['name']
+    track_artist = random_track['track']['artists'][0]['name']
+    # get song url
+    track_url = random_track['track']['external_urls']['spotify']
+    return track_name, track_artist, track_url
+
+
+def get_genre(cuisine):
+    prompt = f"Return a list of Spotify genres that relate to {cuisine}. Return the result in the form of a Python " \
+             f"list object: [genre1,genre2,genre3]." \
+ \
     recipe_completion = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[{"role": "system", "content": "You are a helpful DJ"},
-                          {"role": "user", "content": f"{prompt}"}],
-                temperature=0.7,
-                max_tokens=50,
-            )
-    song_recommendation= recipe_completion['choices'][0]['message']['content']
-    print(song_recommendation)
-    return song_recommendation
-
-
+        model="gpt-3.5-turbo",
+        messages=[{"role": "system", "content": "You are a helpful DJ"},
+                  {"role": "user", "content": f"{prompt}"}],
+        temperature=0.1,
+        max_tokens=50,
+    )
+    genre_recommendation = list(recipe_completion['choices'][0]['message']['content'])
+    st.write(genre_recommendation)
+    # select a genre at random
+    genre_recommendation = random.choice(genre_recommendation)
+    return genre_recommendation
 
 
 def search_spotify(artist_name, song_name):
     query = f'artist:{artist_name} track:{song_name}'
     results = sp.search(q=query, limit=1)
     song_url = results['tracks']['items'][0]['external_urls']['spotify']
-    #print (song_url)
+    # print (song_url)
     return song_url
 
 
@@ -83,10 +104,11 @@ def extract_song_from_results(result_text):
     if match:
         song_name = match.group(1)
         artist_name = match.group(2)
-        #print(f"Song: {song_name}\nArtist: {artist_name}")
+        # print(f"Song: {song_name}\nArtist: {artist_name}")
         return song_name, artist_name
     else:
         print("No match found")
+
 
 def format_subheadings(result_text):
     subheadings = [
@@ -113,6 +135,7 @@ def format_subheadings(result_text):
 
     return "\n".join(lines)
 
+
 def image_to_base64(image_path):
     with Image.open(image_path) as img:
         buffer = BytesIO()
@@ -120,6 +143,7 @@ def image_to_base64(image_path):
         img_base64 = base64.b64encode(buffer.getvalue()).decode()
 
     return f"data:image/jpeg;base64,{img_base64}"
+
 
 st.set_page_config(page_title="VineDine: Savor the Flavor", layout="wide")
 
@@ -176,22 +200,19 @@ with center_column:
     ingredients = st.text_input("Enter ingredients (comma-separated):")
     cuisines = [
         'Italian', 'Chinese', 'Indian', 'Mexican', 'Japanese', 'Mediterranean',
-        'Middle Eastern', 'Thai', 'American', 'Greek', 'French', 'Spanish',"South African"
+        'Middle Eastern', 'Thai', 'American', 'Greek', 'French', 'Spanish', "South African"
     ]
     cuisine = st.selectbox("Select a cuisine:", cuisines)
-    options = ['Anything goes', 'Keto','Low fat', 'Under 300 calories','Vegetarian', 'Vegan', 'Gluten-free']
+    options = ['Anything goes', 'Keto', 'Low fat', 'Under 300 calories', 'Vegetarian', 'Vegan', 'Gluten-free']
     dietary_requirement = st.selectbox("Select a dietary requirement:", options)
 
     if st.button("Find Recipe and Wine Pairing"):
         ingredients_list = [ingredient.strip() for ingredient in ingredients.split(',')]
         result = get_recipe_and_wine(ingredients_list, dietary_requirement, cuisine)
         formatted_result = format_subheadings(result)
-        return_random_song()
-        song_result = get_song(cuisine)
-        formatted_result = formatted_result + "\n\n" + song_result.replace("Song recommendation:", "<br>Song recommendation:</br>")
-        song,artist = extract_song_from_results(song_result)
-        song_url = search_spotify(artist, song)
-
+        genre_result = get_genre(cuisine)
+        song, artist, song_url = return_random_song(genre_result)
+        formatted_result = formatted_result + "\n" + f"<br>Song recommendation: {song} by {artist}</br>"
         st.markdown(formatted_result, unsafe_allow_html=True)
         whatsapp_url = generate_whatsapp_url(result)
         st.markdown(f'<a href="{whatsapp_url}" target="_blank" class="btn">Share by WhatsApp</a>',
