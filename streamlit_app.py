@@ -23,6 +23,7 @@ client_credentials_manager = SpotifyClientCredentials(client_id=os.environ['SPOT
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 
+
 def get_recipe_and_wine(ingredients, dietary_requirement, cuisine):
     prompt = f"Create a {cuisine} recipe that includes {', '.join(ingredients)} and follows the {dietary_requirement} dietary " \
              f"requirement. Also, suggest a wine pairing and suggest a South African wine by brand specifically if " \
@@ -204,6 +205,7 @@ st.markdown(custom_css, unsafe_allow_html=True)
 left_column, center_column, right_column = st.columns([1, 3, 1])
 
 with center_column:
+    create_table()
     st.title("DineVineVibe")
     st.markdown("<p> Enter ingredients and we'll make a recipe for you, suggest a wine pairing - and even come up "
                 "with a Spotify song to cook and dine to! Recipes are built by an AI not Gordon Ramsey so use common "
