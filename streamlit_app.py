@@ -9,7 +9,7 @@ import base64
 from PIL import Image
 from io import BytesIO
 import random
-from recipe_database import create_table, insert_data
+from recipe_database import create_table, insert_data, get_records
 
 
 os.environ['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
@@ -243,4 +243,8 @@ with center_column:
             title = extract_title(result)
             record = create_db_dict(title,result,song,artist,song_url)
             insert_data(record)
+            records = get_records()
+            st.write(records)
+
+
 

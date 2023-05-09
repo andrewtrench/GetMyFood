@@ -17,3 +17,6 @@ def insert_data(result_dict):
     # Save (commit) the changes
     conn.commit()
 
+def get_records():
+    c.execute("SELECT * FROM recipes")
+    return c.fetchall()
