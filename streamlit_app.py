@@ -41,6 +41,9 @@ def get_recipe_and_wine(ingredients, dietary_requirement, cuisine):
     print (results)
     return results
 
+def return_random_song():
+    st.write(sp.recommendation_genre_seeds())
+
 def get_song(cuisine):
 
     prompt = f"Recommend a song and artisy to listen to while cooking {cuisine} food. Select from a wide range of artists who " \
@@ -183,6 +186,7 @@ with center_column:
         ingredients_list = [ingredient.strip() for ingredient in ingredients.split(',')]
         result = get_recipe_and_wine(ingredients_list, dietary_requirement, cuisine)
         formatted_result = format_subheadings(result)
+        return_random_song()
         song_result = get_song(cuisine)
         formatted_result = formatted_result + "\n\n" + song_result.replace("Song recommendation:", "<br>Song recommendation:</br>")
         song,artist = extract_song_from_results(song_result)
