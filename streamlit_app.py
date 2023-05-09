@@ -46,7 +46,7 @@ def return_random_song(genre):
     # Choose a genre
 
     # Get playlists of the genre
-    playlists = sp.category_playlists(category_id=genre, market='IT', limit=50)
+    playlists = sp.category_playlists(category_id=genre, country='Any', limit=50)
     playlist_items = playlists['playlists']['items']
     st.write(playlist_items)
 
