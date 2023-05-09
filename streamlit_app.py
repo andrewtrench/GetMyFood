@@ -239,6 +239,6 @@ with center_column:
             st.markdown(f'<a href="{song_url}" target="_blank" class="btn">Listen to Song</a>',
                     unsafe_allow_html=True)
             title = extract_title(result)
-            record = create_db_dict(title,result,song,artist,song_url,playlist_url)
+            record = create_db_dict(title,result,song,artist,song_url)
             insert_data(record)
 
