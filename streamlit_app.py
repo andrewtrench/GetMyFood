@@ -53,6 +53,9 @@ def return_random_song(genre):
     # Choose a random playlist
     random_playlist = random.choice(playlist_items)
     playlist_id = random_playlist['id']
+    #get playlist url
+    playlist_url = random_playlist['external_urls']['spotify']
+
 
     # Get the tracks in the playlist
     tracks = sp.playlist_items(playlist_id)
@@ -64,7 +67,7 @@ def return_random_song(genre):
     track_artist = random_track['track']['artists'][0]['name']
     # get song url
     track_url = random_track['track']['external_urls']['spotify']
-    return track_name, track_artist, track_url
+    return track_name, track_artist, track_url, playlist_url
 
 
 def get_genre(cuisine):
@@ -184,7 +187,9 @@ st.markdown(custom_css, unsafe_allow_html=True)
 left_column, center_column, right_column = st.columns([1, 3, 1])
 
 with center_column:
-    st.title("VineDine: Savour the Flavour")
+    st.title("VineDineVibe")
+    st.markdown("<p> Enter ingredients and we'll make a recipe for you, suggest a wine pairing - and even come up "
+                "with a Spotify song to cook and eat too!</p>", unsafe_allow_html=True)
     ingredients = st.text_input("Enter ingredients (comma-separated):")
     cuisines = [
         'Italian', 'Chinese', 'Indian', 'Mexican', 'Japanese', 'Mediterranean',
@@ -195,16 +200,23 @@ with center_column:
     dietary_requirement = st.selectbox("Select a dietary requirement:", options)
 
     if st.button("Find Recipe and Wine Pairing"):
-        ingredients_list = [ingredient.strip() for ingredient in ingredients.split(',')]
-        result = get_recipe_and_wine(ingredients_list, dietary_requirement, cuisine)
-        formatted_result = format_subheadings(result)
-        genre_result = get_genre(cuisine)
-        song, artist, song_url = return_random_song(genre_result)
-        line = f"Song recommendation: {song} by {artist} from genre {genre_result}"
-        formatted_result = formatted_result + "\n\n" + format_subheadings(line)
-        st.markdown(formatted_result, unsafe_allow_html=True)
-        whatsapp_url = generate_whatsapp_url(result)
-        st.markdown(f'<a href="{whatsapp_url}" target="_blank" class="btn">Share by WhatsApp</a>',
+        if ingredients == "":
+            st.error("Please enter ingredients.")
+            st.stop()
+        if "," not in ingredients:
+            st.error("Please enter ingredients separated by commas.")
+            st.stop()
+        else:
+            ingredients_list = [ingredient.strip() for ingredient in ingredients.split(',')]
+            result = get_recipe_and_wine(ingredients_list, dietary_requirement, cuisine)
+            formatted_result = format_subheadings(result)
+            genre_result = get_genre(cuisine)
+            song, artist, song_url,playlist_url = return_random_song(genre_result)
+            line = f"Song recommendation: {song} by {artist} from genre {genre_result} and from this <a href='{playlist_url}' target='_blank'>playlist</a>"
+            formatted_result = formatted_result + "\n\n" + format_subheadings(line)
+            st.markdown(formatted_result, unsafe_allow_html=True)
+            whatsapp_url = generate_whatsapp_url(result)
+            st.markdown(f'<a href="{whatsapp_url}" target="_blank" class="btn">Share by WhatsApp</a>',
                     unsafe_allow_html=True)
-        st.markdown(f'<a href="{song_url}" target="_blank" class="btn">Listen to Song</a>',
+            st.markdown(f'<a href="{song_url}" target="_blank" class="btn">Listen to Song</a>',
                     unsafe_allow_html=True)
