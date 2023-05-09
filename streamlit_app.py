@@ -68,16 +68,15 @@ def return_random_song(genre):
 
 def get_genre(cuisine):
     prompt = f"Return a list of Spotify genres that relate to {cuisine}. Return the result in the form of a Python " \
-             f"list object: [genre1,genre2,genre3]." \
- \
-    recipe_completion = openai.ChatCompletion.create(
+             f"list object: [genre1,genre2,genre3]."
+    genre_completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[{"role": "system", "content": "You are a helpful DJ"},
                   {"role": "user", "content": f"{prompt}"}],
         temperature=0.1,
         max_tokens=50,
     )
-    genre_recommendation = list(recipe_completion['choices'][0]['message']['content'])
+    genre_recommendation = list(genre_completion['choices'][0]['message']['content'])
     st.write(genre_recommendation)
     # select a genre at random
     genre_recommendation = random.choice(genre_recommendation)
