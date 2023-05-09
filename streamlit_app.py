@@ -9,6 +9,8 @@ import base64
 from PIL import Image
 from io import BytesIO
 import random
+from recipe_database import create_table, insert_data
+
 
 os.environ['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
 os.environ['SPOTIFY_CLIENT_ID'] = st.secrets['SPOTIFY_CLIENT_ID']
@@ -41,6 +43,15 @@ def get_recipe_and_wine(ingredients, dietary_requirement, cuisine):
     print(results)
     return results
 
+def create_db_dict(title, recipe, song_name, artist, song_url):
+    result_dict = {
+        'recipe_title': title,
+        'recipe': recipe,
+        'song_name': song_name,
+        'artist': artist,
+        'song_url': song_url
+    }
+    return result_dict
 
 def return_random_song(genre):
     # Choose a genre
@@ -126,6 +137,12 @@ def format_subheadings(result_text):
 
     return "\n".join(lines)
 
+def extract_title(result_text):
+    lines = result_text.split("\n")
+    for i, line in enumerate(lines):
+        if "Title:" in line:
+            line = line.replace("Title:", "")
+            return line.strip()
 
 def image_to_base64(image_path):
     with Image.open(image_path) as img:
@@ -213,7 +230,7 @@ with center_column:
             formatted_result = format_subheadings(result)
             genre_result = get_genre(cuisine)
             song, artist, song_url, playlist_url = return_random_song(genre_result)
-            line = f"Song recommendation: {song} by {artist} from genre {genre_result} and from <a href='{playlist_url}' target='_blank'>playlist</a>"
+            line = f"Song recommendation: {song} by {artist} from genre {genre_result} and from this <a href='{playlist_url}' target='_blank'>playlist</a>"
             formatted_result = formatted_result + "\n\n" + format_subheadings(line)
             st.markdown(formatted_result, unsafe_allow_html=True)
             whatsapp_url = generate_whatsapp_url(result)
@@ -221,3 +238,7 @@ with center_column:
                     unsafe_allow_html=True)
             st.markdown(f'<a href="{song_url}" target="_blank" class="btn">Listen to Song</a>',
                     unsafe_allow_html=True)
+            title = extract_title(result)
+            record = create_db_dict(title,result,song,artist,song_url,playlist_url)
+            insert_data(record)
+
