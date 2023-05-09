@@ -79,8 +79,8 @@ def get_genre(cuisine):
     genre_recommendation = list(genre_completion['choices'][0]['message']['content'])
     st.write(genre_recommendation)
     # select a genre at random
-    genre_recommendation = random.choice(genre_recommendation)
-    return genre_recommendation
+    #genre_recommendation = random.choice(genre_recommendation)
+    #return genre_recommendation
 
 
 def search_spotify(artist_name, song_name):
