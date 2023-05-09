@@ -136,7 +136,7 @@ def image_to_base64(image_path):
     return f"data:image/jpeg;base64,{img_base64}"
 
 
-st.set_page_config(page_title="VineDineVibe", layout="centered", page_icon="🍷")
+st.set_page_config(page_title="DineVineVibe", layout="centered", page_icon="🍷")
 
 # Include Bootstrap CDN
 st.markdown("""
@@ -187,9 +187,10 @@ st.markdown(custom_css, unsafe_allow_html=True)
 left_column, center_column, right_column = st.columns([1, 3, 1])
 
 with center_column:
-    st.title("VineDineVibe")
+    st.title("DineVineVibe")
     st.markdown("<p> Enter ingredients and we'll make a recipe for you, suggest a wine pairing - and even come up "
-                "with a Spotify song to cook and eat too!</p>", unsafe_allow_html=True)
+                "with a Spotify song to cook and dine to! Recipes are built by an AI not Gordon Ramsey so use common "
+                "sense if something looks odd.</p>", unsafe_allow_html=True)
     ingredients = st.text_input("Enter ingredients (comma-separated):")
     cuisines = [
         'Italian', 'Chinese', 'Indian', 'Mexican', 'Japanese', 'Mediterranean',
