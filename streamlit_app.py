@@ -46,8 +46,8 @@ def return_random_song(genre):
     # Choose a genre
     query = f"genre%3A{genre}&type=playlist&market=ZA"
     # Get playlists of the genre
-    playlists = sp.search(q=query, type='playlist', market='ZA', limit=50)
-    st.write(playlists)
+    playlists = sp.search(q=query, type='playlist', market='ZA', limit=10)
+    #st.write(playlists)
     playlist_items = playlists['playlists']['items']
     st.write(playlist_items)
 
@@ -225,7 +225,7 @@ with center_column:
         formatted_result = format_subheadings(result)
         genre_result = get_genre(cuisine)
         song, artist, song_url = return_random_song(genre_result)
-        formatted_result = formatted_result + "\n" + f"<br>Song recommendation: {song} by {artist}</br>"
+        formatted_result = formatted_result + "\n\n" + f"<br>Song recommendation: {song} by {artist}</br>"
         st.markdown(formatted_result, unsafe_allow_html=True)
         whatsapp_url = generate_whatsapp_url(result)
         st.markdown(f'<a href="{whatsapp_url}" target="_blank" class="btn">Share by WhatsApp</a>',
