@@ -77,6 +77,7 @@ def get_genre(cuisine):
         max_tokens=50,
     )
     s = genre_completion['choices'][0]['message']['content']
+    print (s)
     match = re.search(r'\[\".*?\"\]', s)
 
     if match:
