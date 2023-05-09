@@ -211,7 +211,7 @@ with center_column:
             result = get_recipe_and_wine(ingredients_list, dietary_requirement, cuisine)
             formatted_result = format_subheadings(result)
             genre_result = get_genre(cuisine)
-            song, artist, song_url,playlist_url = return_random_song(genre_result)
+            song, artist, song_url, playlist_url = return_random_song(genre_result)
             line = f"Song recommendation: {song} by {artist} from genre {genre_result} and from this <a href='{playlist_url}' target='_blank'>playlist</a>"
             formatted_result = formatted_result + "\n\n" + format_subheadings(line)
             st.markdown(formatted_result, unsafe_allow_html=True)
