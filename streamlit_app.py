@@ -47,9 +47,8 @@ def return_random_song(genre):
     query = f"genre%3A{genre}&type=playlist&market=ZA"
     # Get playlists of the genre
     playlists = sp.search(q=query, type='playlist', market='ZA', limit=10)
-    #st.write(playlists)
+
     playlist_items = playlists['playlists']['items']
-    st.write(playlist_items)
 
     # Choose a random playlist
     random_playlist = random.choice(playlist_items)
@@ -79,7 +78,7 @@ def get_genre(cuisine):
         max_tokens=50,
     )
     s = genre_completion['choices'][0]['message']['content']
-    print (s)
+
     match = re.search(r'\[.*?\]', s)
 
     if match:
@@ -91,36 +90,12 @@ def get_genre(cuisine):
 
     genre_recommendation = random.choice(extracted_list)
     return genre_recommendation
-   #st.write(genre_recommendation)
-    # select a genre at random
-    #genre_recommendation = random.choice(genre_recommendation)
-    #return genre_recommendation
-
-
-def search_spotify(artist_name, song_name):
-    query = f'artist:{artist_name} track:{song_name}'
-    results = sp.search(q=query, limit=1)
-    song_url = results['tracks']['items'][0]['external_urls']['spotify']
-    # print (song_url)
-    return song_url
 
 
 def generate_whatsapp_url(text):
     base_url = "https://wa.me/?text="
     encoded_text = urllib.parse.quote(text)
     return f"{base_url}{encoded_text}"
-
-
-def extract_song_from_results(result_text):
-    pattern = r'"(.+?)" by (.+?)[\s\.]'
-    match = re.search(pattern, result_text)
-    if match:
-        song_name = match.group(1)
-        artist_name = match.group(2)
-        # print(f"Song: {song_name}\nArtist: {artist_name}")
-        return song_name, artist_name
-    else:
-        print("No match found")
 
 
 def format_subheadings(result_text):
@@ -225,7 +200,8 @@ with center_column:
         formatted_result = format_subheadings(result)
         genre_result = get_genre(cuisine)
         song, artist, song_url = return_random_song(genre_result)
-        formatted_result = formatted_result + "\n\n" + f"<br>Song recommendation: {song} by {artist}</br>"
+        line = f"Song recommendation: {song} by {artist}"
+        formatted_result = formatted_result + "\n\n" + format_subheadings(line)
         st.markdown(formatted_result, unsafe_allow_html=True)
         whatsapp_url = generate_whatsapp_url(result)
         st.markdown(f'<a href="{whatsapp_url}" target="_blank" class="btn">Share by WhatsApp</a>',
