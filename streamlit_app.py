@@ -87,8 +87,8 @@ def get_genre(cuisine):
         # convert the extracted string to a list
         extracted_list = eval(extracted_list_str)
 
-    genre_recommendation = extracted_list
-    st.write(genre_recommendation)
+    #genre_recommendation = extracted_list
+   #st.write(genre_recommendation)
     # select a genre at random
     #genre_recommendation = random.choice(genre_recommendation)
     #return genre_recommendation
