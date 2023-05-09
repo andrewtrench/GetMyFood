@@ -44,9 +44,10 @@ def get_recipe_and_wine(ingredients, dietary_requirement, cuisine):
 
 def return_random_song(genre):
     # Choose a genre
-
+    query = f"genre%3A{genre}&type=playlist&market=ZA"
     # Get playlists of the genre
-    playlists = sp.category_playlists(category_id=genre, country='ZA', limit=50)
+    playlists = sp.search(q=query, type='playlist', market='ZA', limit=50)
+    st.write(playlists)
     playlist_items = playlists['playlists']['items']
     st.write(playlist_items)
 
