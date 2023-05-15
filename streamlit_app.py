@@ -99,7 +99,7 @@ def get_genre(cuisine):
         # convert the extracted string to a list
         extracted_list = eval(extracted_list_str)
         genre_recommendation = random.choice(extracted_list)
-    return genre_recommendation
+        return genre_recommendation
 
 
 def generate_whatsapp_url(text):
