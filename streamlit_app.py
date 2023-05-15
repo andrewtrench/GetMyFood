@@ -25,17 +25,13 @@ sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 
 def get_recipe_and_wine(ingredients, dietary_requirement, cuisine):
-    prompt = f"Create a {cuisine} recipe that includes {', '.join(ingredients)} and follows the {dietary_requirement} dietary " \
-             f"requirement. Also, suggest a wine pairing and suggest a South African wine by brand specifically if " \
-             f"possible, " \
-             f"and complimentary spices and herbs. Show the estimated calories per portion. Use these subheadings it " \
-             f"the results: 'Ingredients:', 'Instructions:', 'Wine pairing:','South African wine recommendation:', " \
-             f"'Complimentary spices and herbs:', 'Estimated calories per portion:'. Give the " \
-             f"recipe a name and use it as a title indicated by 'Title:'.Use centigrade for temperature and grams for weight. "
+
+    prompt = f"""As a creative chef, you are renowned for your unique and innovative dishes. Given the ingredients {', '.join(ingredients)}, create a unique and exciting recipe that reflects the {cuisine} cuisine and complies with the {dietary_requirement} dietary requirement. Avoid common dishes such as stews, soups or casseroles. 
+Remember to include the cooking method, the preparation steps, and presentation ideas. Also, suggest a wine pairing and suggest a South African wine by brand specifically if possible, and complimentary spices and herbs. Show the estimated calories per portion. Use these subheadings it the results: 'Ingredients:', 'Instructions:', 'Wine pairing:','South African wine recommendation:','Complimentary spices and herbs:', 'Estimated calories per portion:'. Give the recipe a name and use it as a title indicated by 'Title:'.Use centigrade for temperature and grams for weight. """
 
     recipe_completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
-        messages=[{"role": "system", "content": "You are a helpful chef and gourmand"},
+        messages=[{"role": "system", "content": "You are a creative chef renowned for your innovative dishes."},
                   {"role": "user", "content": f"{prompt}"}],
         temperature=0.7,
         max_tokens=500,
@@ -93,7 +89,7 @@ def get_genre(cuisine):
         max_tokens=50,
     )
     s = genre_completion['choices'][0]['message']['content']
-
+    print (s)
     match = re.search(r'\[.*?\]', s)
 
     if match:
@@ -102,8 +98,7 @@ def get_genre(cuisine):
 
         # convert the extracted string to a list
         extracted_list = eval(extracted_list_str)
-
-    genre_recommendation = random.choice(extracted_list)
+        genre_recommendation = random.choice(extracted_list)
     return genre_recommendation
 
 
@@ -157,12 +152,11 @@ def image_to_base64(image_path):
 st.set_page_config(page_title="DineVineVibe", layout="centered", page_icon="🍷")
 
 # Include Bootstrap CDN
-st.markdown("""
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-""", unsafe_allow_html=True)
+st.markdown("""<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" 
+integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">""" ,
+unsafe_allow_html=True)
 
-st.markdown("""
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 """, unsafe_allow_html=True)
 
 background_image = "veggies.jpg"
