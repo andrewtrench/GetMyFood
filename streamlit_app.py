@@ -100,6 +100,8 @@ def get_genre(cuisine):
         extracted_list = eval(extracted_list_str)
         genre_recommendation = random.choice(extracted_list)
         return genre_recommendation
+    else:
+        genre_completion = random.choice(sp.recommendation_genre_seeds())
 
 
 def generate_whatsapp_url(text):
