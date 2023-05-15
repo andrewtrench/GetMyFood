@@ -98,7 +98,7 @@ def get_genre(cuisine):
         genre_recommendation = random.choice(extracted_list)
         return genre_recommendation
     else:
-        genre_completion = random.choice(sp.recommendation_genre_seeds())
+        genre_completion = random.choice(['World','World Chill','Vocal Jazz','Roots Reggae','Soul','Soul Jazz','Salsa',])
 
 
 def generate_whatsapp_url(text):
