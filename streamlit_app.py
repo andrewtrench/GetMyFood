@@ -11,7 +11,6 @@ from io import BytesIO
 import random
 from recipe_database import create_table, insert_data, get_records
 
-
 os.environ['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
 os.environ['SPOTIFY_CLIENT_ID'] = st.secrets['SPOTIFY_CLIENT_ID']
 os.environ['SPOTIFY_CLIENT_SECRET'] = st.secrets['SPOTIFY_CLIENT_SECRET']
@@ -23,11 +22,8 @@ client_credentials_manager = SpotifyClientCredentials(client_id=os.environ['SPOT
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 
-
 def get_recipe_and_wine(ingredients, dietary_requirement, cuisine):
-
-    prompt = f"""As a creative chef, you are renowned for your unique and innovative dishes. Given the ingredients {', '.join(ingredients)}, create a unique and exciting recipe that reflects the {cuisine} cuisine and complies with the {dietary_requirement} dietary requirement. Avoid common dishes such as stews, soups or casseroles. 
-Remember to include the cooking method, the preparation steps, and presentation ideas. Also, suggest a wine pairing and suggest a South African wine by brand specifically if possible, and complimentary spices and herbs. Show the estimated calories per portion. Use these subheadings it the results: 'Ingredients:', 'Instructions:', 'Wine pairing:','South African wine recommendation:','Complimentary spices and herbs:', 'Estimated calories per portion:'. Give the recipe a name and use it as a title indicated by 'Title:'.Use centigrade for temperature and grams for weight. """
+    prompt = f"""As a creative chef, you are renowned for your unique and innovative dishes. Given the ingredients {', '.join(ingredients)}, create a unique and exciting recipe that reflects the {cuisine} cuisine and complies with the {dietary_requirement} dietary requirement. Avoid common dishes such as stews, soups or casseroles. Remember to include the cooking method, the preparation steps, and presentation ideas. Also, suggest a wine pairing and suggest a South African wine by brand specifically if possible, and complimentary spices and herbs. Show the estimated calories per portion. Use these subheadings it the results: 'Ingredients:', 'Instructions:', 'Wine pairing:','South African wine recommendation:','Complimentary spices and herbs:', 'Estimated calories per portion:'. Give the recipe a name and use it as a title indicated by 'Title:'.Use centigrade for temperature and grams for weight."""
 
     recipe_completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -40,6 +36,7 @@ Remember to include the cooking method, the preparation steps, and presentation 
     print(results)
     return results
 
+
 def create_db_dict(title, recipe, song_name, artist, song_url):
     result_dict = {
         'recipe_title': title,
@@ -49,6 +46,7 @@ def create_db_dict(title, recipe, song_name, artist, song_url):
         'song_url': song_url
     }
     return result_dict
+
 
 def return_random_song(genre):
     # Choose a genre
@@ -61,9 +59,8 @@ def return_random_song(genre):
     # Choose a random playlist
     random_playlist = random.choice(playlist_items)
     playlist_id = random_playlist['id']
-    #get playlist url
+    # get playlist url
     playlist_url = random_playlist['external_urls']['spotify']
-
 
     # Get the tracks in the playlist
     tracks = sp.playlist_items(playlist_id)
@@ -79,7 +76,7 @@ def return_random_song(genre):
 
 
 def get_genre(cuisine):
-    prompt = f"Return a list of five Spotify genres that relate to {cuisine}. Return the result in the form of a Python " \
+    prompt = f"Return a list of five Spotify genres that relate to {cuisine}. Return the result in the form of a Python"\
              f"list object: [genre1,genre2,genre3]."
     genre_completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -135,12 +132,14 @@ def format_subheadings(result_text):
 
     return "\n".join(lines)
 
+
 def extract_title(result_text):
     lines = result_text.split("\n")
     for i, line in enumerate(lines):
         if "Title:" in line:
             line = line.replace("Title:", "")
             return line.strip()
+
 
 def image_to_base64(image_path):
     with Image.open(image_path) as img:
@@ -155,8 +154,8 @@ st.set_page_config(page_title="DineVineVibe", layout="centered", page_icon="🍷
 
 # Include Bootstrap CDN
 st.markdown("""<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" 
-integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">""" ,
-unsafe_allow_html=True)
+integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">""",
+            unsafe_allow_html=True)
 
 st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 """, unsafe_allow_html=True)
@@ -227,20 +226,20 @@ with center_column:
             result = get_recipe_and_wine(ingredients_list, dietary_requirement, cuisine)
             formatted_result = format_subheadings(result)
             genre_result = get_genre(cuisine)
-            song, artist, song_url, playlist_url = return_random_song(genre_result)
+            try:
+                song, artist, song_url, playlist_url = return_random_song(genre_result)
+            except KeyError:
+                song, artist, song_url, playlist_url = return_random_song("World")
             line = f"Song recommendation: {song} by {artist} from genre {genre_result} and from this <a href='{playlist_url}' target='_blank'>playlist</a>"
             formatted_result = formatted_result + "\n\n" + format_subheadings(line)
             st.markdown(formatted_result, unsafe_allow_html=True)
             whatsapp_url = generate_whatsapp_url(result)
             st.markdown(f'<a href="{whatsapp_url}" target="_blank" class="btn">Share by WhatsApp</a>',
-                    unsafe_allow_html=True)
+                        unsafe_allow_html=True)
             st.markdown(f'<a href="{song_url}" target="_blank" class="btn">Listen to Song</a>',
-                    unsafe_allow_html=True)
+                        unsafe_allow_html=True)
             title = extract_title(result)
-            record = create_db_dict(title,result,song,artist,song_url)
+            record = create_db_dict(title, result, song, artist, song_url)
             insert_data(record)
             records = get_records()
-            #st.write(records)
-
-
-
+            # st.write(records)
