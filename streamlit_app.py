@@ -253,7 +253,7 @@ with center_column:
 
             # Embed Spotify song using HTML iframe
             components.html(
-                f'<iframe src="{song_embed_url}" width="80%" height="380" frameborder="0" allowtransparency="true" '
+                f'<iframe src="{song_embed_url}" width="95%" height="380" frameborder="0" allowtransparency="true" '
                 f'allow="encrypted-media"></iframe>',
                 height=400
             )
