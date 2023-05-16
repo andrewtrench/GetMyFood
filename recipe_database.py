@@ -16,7 +16,7 @@ def insert_data(result_dict):
     c.execute("INSERT INTO recipes VALUES (:recipe_title, :recipe, :song_name, :artist, :song_url)", result_dict)
     # Save (commit) the changes
     conn.commit()
-@st.cache_data(allow_output_mutation=True)
+@st.cache_data
 def get_records():
     c.execute("SELECT * FROM recipes")
     return c.fetchall()
