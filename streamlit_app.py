@@ -208,7 +208,7 @@ left_column, center_column, right_column = st.columns([1, 3, 1])
 
 with center_column:
     st.title("DineVineVibe")
-    st.markdown("<h2 color='yellow'>Under Development</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='color: red;'>Under Development</p>", unsafe_allow_html=True)
     st.markdown("<p> Enter ingredients and we'll make a recipe for you, suggest a wine pairing - and even come up "
                 "with a Spotify song to cook and dine to! Recipes are built by an AI not Gordon Ramsey so use common "
                 "sense if something looks odd.</p>", unsafe_allow_html=True)
