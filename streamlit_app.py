@@ -10,6 +10,7 @@ import base64
 from PIL import Image
 from io import BytesIO
 import random
+from concurrent.futures import ThreadPoolExecutor
 
 os.environ['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
 os.environ['SPOTIFY_CLIENT_ID'] = st.secrets['SPOTIFY_CLIENT_ID']
@@ -228,9 +229,15 @@ with center_column:
             st.stop()
         else:
             ingredients_list = [ingredient.strip() for ingredient in ingredients.split(',')]
-            result = get_recipe_and_wine(ingredients_list, dietary_requirement, cuisine)
-            formatted_result = format_subheadings(result)
-            genre_result = get_genre(cuisine)
+            #result = get_recipe_and_wine(ingredients_list, dietary_requirement, cuisine)
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                future1 = executor.submit(get_recipe_and_wine, ingredients_list, dietary_requirement,
+                                          cuisine)
+                future2 = executor.submit(get_genre, cuisine)
+                result = future1.result()
+                genre_result = future2.result()
+                formatted_result = format_subheadings(result)
+                #genre_result = get_genre(cuisine)
             try:
                 song, artist, song_url, playlist_url = return_random_song(genre_result)
             except KeyError:
@@ -246,7 +253,8 @@ with center_column:
 
             # Embed Spotify song using HTML iframe
             components.html(
-                f'<iframe src="{song_embed_url}" width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>',
+                f'<iframe src="{song_embed_url}" width="80%" height="380" frameborder="0" allowtransparency="true" '
+                f'allow="encrypted-media"></iframe>',
                 height=400
             )
             # st.markdown(f'<a href="{song_url}" target="_blank" class="btn">Listen to Song</a>',
