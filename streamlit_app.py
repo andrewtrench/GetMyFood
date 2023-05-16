@@ -242,6 +242,5 @@ with center_column:
             title = extract_title(result)
             record = create_db_dict(title, result, song, artist, song_url)
             insert_data(record)
-            st.cache_resources()
             records = get_records()
             st.write(records)
