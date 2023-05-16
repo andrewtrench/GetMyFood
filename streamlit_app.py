@@ -65,7 +65,7 @@ def return_random_song(genre):
             playlist_id = random_playlist['id']
             # get playlist url
             playlist_url = random_playlist['external_urls']['spotify']
-
+            st.write(playlist_url)
             # Get the tracks in the playlist
             tracks = sp.playlist_items(playlist_id)
             track_items = tracks['items']
