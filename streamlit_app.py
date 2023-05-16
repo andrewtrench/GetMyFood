@@ -214,6 +214,12 @@ with center_column:
     options = ['Anything goes', 'Keto', 'Low fat', 'Under 300 calories', 'Vegetarian', 'Vegan', 'Gluten-free']
     dietary_requirement = st.selectbox("Select a dietary requirement:", options)
 
+    st.write("Recent Recipes")
+    recent = get_records()[0:3]
+    for i,recipe in enumerate(recent):
+        st.markdown(f"<a href='{recipe[i][2]}' target='_blank'>{recipe[i][1]}</a>", unsafe_allow_html=True)
+
+
     if st.button("Find Recipe and Wine Pairing"):
         if ingredients == "":
             st.error("Please enter ingredients.")
