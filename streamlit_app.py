@@ -10,7 +10,6 @@ import base64
 from PIL import Image
 from io import BytesIO
 import random
-from recipe_database import create_table, insert_data, get_records
 
 os.environ['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
 os.environ['SPOTIFY_CLIENT_ID'] = st.secrets['SPOTIFY_CLIENT_ID']
@@ -23,8 +22,8 @@ client_credentials_manager = SpotifyClientCredentials(client_id=os.environ['SPOT
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 
-def get_recipe_and_wine(ingredients, dietary_requirement, cuisine):
-    prompt = f"""As a creative chef, you are renowned for your unique and innovative dishes. Given the ingredients {', '.join(ingredients)}, create a unique and exciting recipe that reflects the {cuisine} cuisine and complies with the {dietary_requirement} dietary requirement. Avoid common dishes such as stews, soups or casseroles. Remember to include the cooking method, the preparation steps, and presentation ideas. Also, suggest a wine pairing and suggest a South African wine by brand specifically if possible, and complimentary spices and herbs. Show the estimated calories per portion. Use these subheadings it the results: 'Ingredients:', 'Instructions:', 'Wine pairing:','South African wine recommendation:','Complimentary spices and herbs:', 'Estimated calories per portion:'. Give the recipe a name and use it as a title indicated by 'Title:'.Use centigrade for temperature and grams for weight."""
+def get_recipe_and_wine(prompt_ingredients, prompt_dietary_requirement, prompt_cuisine):
+    prompt = f"""As a creative chef, you are renowned for your unique and innovative dishes. Given the ingredients {', '.join(prompt_ingredients)}, create a unique and exciting recipe that reflects the {prompt_cuisine} cuisine and complies with the {prompt_dietary_requirement} dietary requirement. Avoid common dishes such as stews, soups or casseroles. Remember to include the cooking method, the preparation steps, and presentation ideas. Also, suggest a wine pairing and suggest a South African wine by brand specifically if possible, and complimentary spices and herbs. Show the estimated calories per portion. Use these subheadings it the results: 'Ingredients:', 'Instructions:', 'Wine pairing:','South African wine recommendation:','Complimentary spices and herbs:', 'Estimated calories per portion:'. Give the recipe a name and use it as a title indicated by 'Title:'.Use centigrade for temperature and grams for weight."""
 
     recipe_completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -38,13 +37,13 @@ def get_recipe_and_wine(ingredients, dietary_requirement, cuisine):
     return results
 
 
-def create_db_dict(title, recipe, song_name, artist, song_url):
+def create_db_dict(db_title, recipe, song_name, db_artist, db_song_url):
     result_dict = {
-        'recipe_title': title,
+        'recipe_title': db_title,
         'recipe': recipe,
         'song_name': song_name,
-        'artist': artist,
-        'song_url': song_url
+        'artist': db_artist,
+        'song_url': db_song_url
     }
     return result_dict
 
@@ -64,8 +63,8 @@ def return_random_song(genre):
             random_playlist = random.choice(playlist_items)
             playlist_id = random_playlist['id']
             # get playlist url
-            playlist_url = random_playlist['external_urls']['spotify']
-            st.write(playlist_url)
+            selector_playlist_url = random_playlist['external_urls']['spotify']
+            #st.write(selector_playlist_url)
             # Get the tracks in the playlist
             tracks = sp.playlist_items(playlist_id)
             track_items = tracks['items']
@@ -76,11 +75,9 @@ def return_random_song(genre):
             track_artist = random_track['track']['artists'][0]['name']
             # get song url
             track_url = random_track['track']['external_urls']['spotify']
+            return track_name, track_artist, track_url, selector_playlist_url
         except IndexError:
             continue
-
-
-    return track_name, track_artist, track_url, playlist_url
 
 
 def get_genre(cuisine):
@@ -94,8 +91,8 @@ def get_genre(cuisine):
         max_tokens=50,
     )
     s = genre_completion['choices'][0]['message']['content']
-    st.write(s)
-    match = re.search(r'\[.*?\]', s)
+    #st.write(s)
+    match = re.search(r'\[.*?]', s)
 
     if match:
         # extract the list from the string
@@ -209,7 +206,6 @@ st.markdown(custom_css, unsafe_allow_html=True)
 left_column, center_column, right_column = st.columns([1, 3, 1])
 
 with center_column:
-    create_table()
     st.title("DineVineVibe")
     st.markdown("<p> Enter ingredients and we'll make a recipe for you, suggest a wine pairing - and even come up "
                 "with a Spotify song to cook and dine to! Recipes are built by an AI not Gordon Ramsey so use common "
@@ -253,10 +249,7 @@ with center_column:
                 f'<iframe src="{song_embed_url}" width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>',
                 height=400
             )
-            #st.markdown(f'<a href="{song_url}" target="_blank" class="btn">Listen to Song</a>',
+            # st.markdown(f'<a href="{song_url}" target="_blank" class="btn">Listen to Song</a>',
             #            unsafe_allow_html=True)
             title = extract_title(result)
             record = create_db_dict(title, result, song, artist, song_url)
-            insert_data(record)
-            records = get_records()
-            st.write(records)
