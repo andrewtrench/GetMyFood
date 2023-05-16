@@ -76,7 +76,7 @@ def return_random_song(genre):
 
 
 def get_genre(cuisine):
-    prompt = f"Return a list of five Spotify genres that relate to {cuisine}. Return the result in the form of a Python"\
+    prompt = f"Return a list of five Spotify genres that relate to {cuisine}. Return the result in the form of a Python" \
              f"list object: [genre1,genre2,genre3]."
     genre_completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -98,7 +98,8 @@ def get_genre(cuisine):
         genre_recommendation = random.choice(extracted_list)
         return genre_recommendation
     else:
-        genre_completion = random.choice(['World','World Chill','Vocal Jazz','Roots Reggae','Soul','Soul Jazz','Salsa',])
+        genre_completion = random.choice(
+            ['World', 'World Chill', 'Vocal Jazz', 'Roots Reggae', 'Soul', 'Soul Jazz', 'Salsa', ])
 
 
 def generate_whatsapp_url(text):
@@ -214,12 +215,6 @@ with center_column:
     options = ['Anything goes', 'Keto', 'Low fat', 'Under 300 calories', 'Vegetarian', 'Vegan', 'Gluten-free']
     dietary_requirement = st.selectbox("Select a dietary requirement:", options)
 
-    st.write("Recent Recipes")
-    recent = get_records()[0:3]
-    for i,recipe in enumerate(recent):
-        st.markdown(f"<a href='{recipe[i][2]}' target='_blank'>{recipe[i][1]}</a>", unsafe_allow_html=True)
-
-
     if st.button("Find Recipe and Wine Pairing"):
         if ingredients == "":
             st.error("Please enter ingredients.")
@@ -247,5 +242,6 @@ with center_column:
             title = extract_title(result)
             record = create_db_dict(title, result, song, artist, song_url)
             insert_data(record)
+            st.cache_resources()
             records = get_records()
-            # st.write(records)
+            st.write(records)
