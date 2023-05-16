@@ -4,6 +4,7 @@ import urllib.parse
 import openai
 import spotipy
 import streamlit as st
+from streamlit import components
 from spotipy.oauth2 import SpotifyClientCredentials
 import base64
 from PIL import Image
@@ -237,8 +238,16 @@ with center_column:
             whatsapp_url = generate_whatsapp_url(result)
             st.markdown(f'<a href="{whatsapp_url}" target="_blank" class="btn">Share by WhatsApp</a>',
                         unsafe_allow_html=True)
-            st.markdown(f'<a href="{song_url}" target="_blank" class="btn">Listen to Song</a>',
-                        unsafe_allow_html=True)
+            # Convert the Spotify URL to Spotify Embed URL
+            song_embed_url = song_url.replace("spotify.com/track", "open.spotify.com/embed/track")
+
+            # Embed Spotify song using HTML iframe
+            components.html(
+                f'<iframe src="{song_embed_url}" width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>',
+                height=400
+            )
+            #st.markdown(f'<a href="{song_url}" target="_blank" class="btn">Listen to Song</a>',
+            #            unsafe_allow_html=True)
             title = extract_title(result)
             record = create_db_dict(title, result, song, artist, song_url)
             insert_data(record)
