@@ -4,7 +4,7 @@ import urllib.parse
 import openai
 import spotipy
 import streamlit as st
-from streamlit import components
+from streamlit.components import v1 as components
 from spotipy.oauth2 import SpotifyClientCredentials
 import base64
 from PIL import Image
