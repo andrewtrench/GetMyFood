@@ -246,7 +246,7 @@ with center_column:
             st.markdown(f'<a href="{whatsapp_url}" target="_blank" class="btn">Share by WhatsApp</a>',
                         unsafe_allow_html=True)
             # Convert the Spotify URL to Spotify Embed URL
-            song_embed_url = song_url.replace("spotify.com/track", "open.spotify.com/embed/track")
+            song_embed_url = song_url.replace("open.spotify.com/track", "open.spotify.com/embed/track")
 
             # Embed Spotify song using HTML iframe
             components.html(
