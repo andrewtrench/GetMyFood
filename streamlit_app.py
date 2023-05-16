@@ -56,23 +56,30 @@ def return_random_song(genre):
     playlists = sp.search(q=query, type='playlist', market='ZA', limit=10)
 
     playlist_items = playlists['playlists']['items']
-
-    # Choose a random playlist
-    random_playlist = random.choice(playlist_items)
-    playlist_id = random_playlist['id']
-    # get playlist url
-    playlist_url = random_playlist['external_urls']['spotify']
-
-    # Get the tracks in the playlist
-    tracks = sp.playlist_items(playlist_id)
-    track_items = tracks['items']
-
+    random_track = None
     # Choose a random track
-    random_track = random.choice(track_items)
-    track_name = random_track['track']['name']
-    track_artist = random_track['track']['artists'][0]['name']
-    # get song url
-    track_url = random_track['track']['external_urls']['spotify']
+    while random_track is None:
+        try:
+            # Choose a random playlist
+            random_playlist = random.choice(playlist_items)
+            playlist_id = random_playlist['id']
+            # get playlist url
+            playlist_url = random_playlist['external_urls']['spotify']
+
+            # Get the tracks in the playlist
+            tracks = sp.playlist_items(playlist_id)
+            track_items = tracks['items']
+
+            # Choose a random track
+            random_track = random.choice(track_items)
+            track_name = random_track['track']['name']
+            track_artist = random_track['track']['artists'][0]['name']
+            # get song url
+            track_url = random_track['track']['external_urls']['spotify']
+        except IndexError:
+            continue
+
+
     return track_name, track_artist, track_url, playlist_url
 
 
