@@ -266,8 +266,8 @@ with center_column:
                 "sense if something looks odd.</p>", unsafe_allow_html=True)
     ingredients = st.text_input("Enter ingredients (comma-separated):")
     cuisines = [
-        'Italian', 'Chinese', 'Indian', 'Mexican', 'Japanese', 'Mediterranean',
-        'Middle Eastern', 'Thai', 'American', 'Greek', 'French', 'Spanish', "South African"
+        'Italian', "African",'Chinese', 'Indian', 'Mexican', 'Japanese',
+        'Middle Eastern', 'Thai', 'American', 'Greek', 'French', 'Spanish'
     ]
     cuisine = st.selectbox("Select a cuisine:", cuisines)
     options = ['Anything goes', 'Keto', 'Low fat', 'Under 300 calories', 'Vegetarian', 'Vegan', 'Gluten-free']
