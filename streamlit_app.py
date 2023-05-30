@@ -280,7 +280,7 @@ left_column, center_column, right_column = st.columns([1, 3, 1])
 with center_column:
     st.title("DineVineVibe")
     st.markdown("<p style='color: red;'>Under Development</p>", unsafe_allow_html=True)
-    st.markdown("""<p> Enter ingredients and we'll make a recipe for you, suggest a wine pairing (and 🇿🇦  one 
+    st.markdown("""<p> Enter ingredients and we'll make a recipe for you, suggest a wine pairing (and SA one 
     specifically, because that's how we roll!) - and even come up with a Spotify song to cook and dine to! </p> 
     <p>Recipes are built by an AI not Gordon Ramsey so use common sense if something looks odd.</p>""",
                 unsafe_allow_html=True)
@@ -316,6 +316,7 @@ with center_column:
             except KeyError:
                 song, artist, song_url, playlist_url = return_random_song("World")
             line = f"Song recommendation: {song} by {artist} from genre {genre_result} and from this <a href='{playlist_url}' target='_blank'>playlist</a>"
+            spotify_spot = st.empty()
             formatted_result = formatted_result + "\n\n" + format_subheadings(line)
             st.markdown(formatted_result, unsafe_allow_html=True)
             whatsapp_url = generate_whatsapp_url(result)
@@ -325,7 +326,7 @@ with center_column:
             song_embed_url = song_url.replace("open.spotify.com/track", "open.spotify.com/embed/track")
 
             # Embed Spotify song using HTML iframe
-            components.html(
+            spotify_spot = components.html(
                 f'<iframe src="{song_embed_url}" width="95%" height="380" frameborder="0" allowtransparency="true" '
                 f'allow="encrypted-media"></iframe>',
                 height=400
