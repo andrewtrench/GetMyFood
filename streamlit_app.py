@@ -24,18 +24,24 @@ sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 
 def get_recipe_and_wine(prompt_ingredients, prompt_dietary_requirement, prompt_cuisine):
-    prompt = f"""As a creative chef, you are renowned for your unique and innovative dishes. Given the ingredients {', '.join(prompt_ingredients)}, create a unique and exciting recipe that reflects the {prompt_cuisine} cuisine and complies with the {prompt_dietary_requirement} dietary requirement. Avoid common dishes such as stews, soups or casseroles. Remember to include the cooking method, the preparation steps, and presentation ideas. Also, suggest a wine pairing and suggest a South African wine by brand specifically if possible, and complimentary spices and herbs. Show the estimated calories per portion. Use these subheadings it the results: 'Ingredients:', 'Instructions:', 'Wine pairing:','South African wine recommendation:','Complimentary spices and herbs:', 'Estimated calories per portion:'. Give the recipe a name and use it as a title indicated by 'Title:'.Use centigrade for temperature and grams for weight."""
+    while True:
+        try:
 
-    recipe_completion = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "system", "content": "You are a creative chef renowned for your innovative dishes."},
-                  {"role": "user", "content": f"{prompt}"}],
-        temperature=0.7,
-        max_tokens=500,
-    )
-    results = recipe_completion['choices'][0]['message']['content']
-    print(results)
-    return results
+            prompt = f"""As a creative chef, you are renowned for your unique and innovative dishes. Given the ingredients {', '.join(prompt_ingredients)}, create a unique and exciting recipe that reflects the {prompt_cuisine} cuisine and complies with the {prompt_dietary_requirement} dietary requirement. Avoid common dishes such as stews, soups or casseroles. Remember to include the cooking method, the preparation steps, and presentation ideas. Also, suggest a wine pairing and suggest a South African wine by brand specifically if possible, and complimentary spices and herbs. Show the estimated calories per portion. Use these subheadings it the results: 'Ingredients:', 'Instructions:', 'Wine pairing:','South African wine recommendation:','Complimentary spices and herbs:', 'Estimated calories per portion:'. Give the recipe a name and use it as a title indicated by 'Title:'.Use centigrade for temperature and grams for weight."""
+
+            recipe_completion = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "system", "content": "You are a creative chef renowned for your innovative dishes."},
+                          {"role": "user", "content": f"{prompt}"}],
+                temperature=0.7,
+                max_tokens=500,
+            )
+            results = recipe_completion['choices'][0]['message']['content']
+            print(results)
+            return results
+        except (openai.error.InvalidRequestError, openai.error.APIConnectionError, openai.error.AuthenticationError, openai.error.APIError, openai.error.RateLimitError) as e:
+            print(e)
+            continue
 
 
 def create_db_dict(db_title, recipe, song_name, db_artist, db_song_url):
@@ -49,56 +55,70 @@ def create_db_dict(db_title, recipe, song_name, db_artist, db_song_url):
     return result_dict
 
 def return_random_song(genre):
-    query = f"genre%3A{genre}&type=playlist&market=ZA"
-    playlists = sp.search(q=query, type='playlist', market='ZA', limit=10)
-    playlist_items = playlists['playlists']['items']
 
-    # Raise an exception if no playlists are found
-    if not playlist_items:
-        raise ValueError(f"No playlists found for genre {genre}")
+    while True:
+        try:
 
-    # Try to select a playlist and track
-    for _ in range(len(playlist_items)):
-        random_playlist = random.choice(playlist_items)
-        playlist_id = random_playlist['id']
-        selector_playlist_url = random_playlist['external_urls']['spotify']
-        tracks = sp.playlist_items(playlist_id)
-        track_items = tracks['items']
+            query = f"genre%3A{genre}&type=playlist&market=ZA"
+            playlists = sp.search(q=query, type='playlist', market='ZA', limit=10)
+            playlist_items = playlists['playlists']['items']
 
-        # If the playlist has no tracks, remove it from the list and try again
-        if not track_items:
-            playlist_items.remove(random_playlist)
+            # Raise an exception if no playlists are found
+            if not playlist_items:
+                raise ValueError(f"No playlists found for genre {genre}")
+
+            # Try to select a playlist and track
+            for _ in range(len(playlist_items)):
+                random_playlist = random.choice(playlist_items)
+                playlist_id = random_playlist['id']
+                selector_playlist_url = random_playlist['external_urls']['spotify']
+                tracks = sp.playlist_items(playlist_id)
+                track_items = tracks['items']
+
+                # If the playlist has no tracks, remove it from the list and try again
+                if not track_items:
+                    playlist_items.remove(random_playlist)
+                    continue
+
+                random_track = random.choice(track_items)
+                track_name = random_track['track']['name']
+                track_artist = random_track['track']['artists'][0]['name']
+                track_url = random_track['track']['external_urls']['spotify']
+                return track_name, track_artist, track_url, selector_playlist_url
+
+            # Raise an exception if no tracks are found in any of the playlists
+            raise ValueError(f"No tracks found in playlists for genre {genre}")
+
+        except (spotipy.client.SpotifyException, spotipy.SpotifyException) as e:
+            print(e)
             continue
 
-        random_track = random.choice(track_items)
-        track_name = random_track['track']['name']
-        track_artist = random_track['track']['artists'][0]['name']
-        track_url = random_track['track']['external_urls']['spotify']
-        return track_name, track_artist, track_url, selector_playlist_url
-
-    # Raise an exception if no tracks are found in any of the playlists
-    raise ValueError(f"No tracks found in playlists for genre {genre}")
 def get_genre(cuisine):
-    prompt = f"Return a list of five Spotify genres that relate to {cuisine}. Return the result in the form of a Python" \
-             f"list object: [genre1,genre2,genre3]."
-    genre_completion = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "system", "content": "You are a helpful DJ"},
-                  {"role": "user", "content": f"{prompt}"}],
-        temperature=0.1,
-        max_tokens=50,
-    )
-    s = genre_completion['choices'][0]['message']['content']
-    match = re.search(r'\[.*?]', s)
+    while True:
+        try:
 
-    if match:
-        extracted_list_str = match.group(0)
-        extracted_list = eval(extracted_list_str)
-        genre_recommendation = random.choice(extracted_list)
-        return genre_recommendation
-    else:
-        raise ValueError("AI response does not contain a genre list in the expected format")
+            prompt = f"Return a list of five Spotify genres that relate to {cuisine}. Return the result in the form of a Python" \
+                     f"list object: [genre1,genre2,genre3]."
+            genre_completion = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "system", "content": "You are a helpful DJ"},
+                          {"role": "user", "content": f"{prompt}"}],
+                temperature=0.1,
+                max_tokens=50,
+            )
+            s = genre_completion['choices'][0]['message']['content']
+            match = re.search(r'\[.*?]', s)
 
+            if match:
+                extracted_list_str = match.group(0)
+                extracted_list = eval(extracted_list_str)
+                genre_recommendation = random.choice(extracted_list)
+                return genre_recommendation
+            else:
+                raise ValueError("AI response does not contain a genre list in the expected format")
+        except (openai.error.InvalidRequestError, openai.error.APIConnectionError, openai.error.AuthenticationError, openai.error.APIError, openai.error.RateLimitError) as e:
+            print(e)
+            continue
 
 # def return_random_song(genre):
 #     # Choose a genre
@@ -260,10 +280,10 @@ left_column, center_column, right_column = st.columns([1, 3, 1])
 with center_column:
     st.title("DineVineVibe")
     st.markdown("<p style='color: red;'>Under Development</p>", unsafe_allow_html=True)
-    st.markdown("<p> Enter ingredients and we'll make a recipe for you, suggest a wine pairing - and even come up "
-                "with a Spotify song to cook and dine to!</p>"
-                "<p>Recipes are built by an AI not Gordon Ramsey so use common "
-                "sense if something looks odd.</p>", unsafe_allow_html=True)
+    st.markdown("""<p> Enter ingredients and we'll make a recipe for you, suggest a wine pairing (and 🇿🇦  one 
+    specifically, because that's how we roll!) - and even come up with a Spotify song to cook and dine to! </p> 
+    <p>Recipes are built by an AI not Gordon Ramsey so use common sense if something looks odd.</p>""",
+                unsafe_allow_html=True)
     ingredients = st.text_input("Enter ingredients (comma-separated):")
     cuisines = [
         'Italian', "African",'Chinese', 'Indian', 'Mexican', 'Japanese',
